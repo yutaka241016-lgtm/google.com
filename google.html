@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>文部科学省 統合学習支援システム | マイページ</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap');
+        body { font-family: 'Noto Sans JP', sans-serif; }
+        
+        /* スクロールバーのカスタマイズ（目立たなくする） */
+        ::-webkit-scrollbar { width: 5px; }
+        ::-webkit-scrollbar-track { background: #f1f1f1; }
+        ::-webkit-scrollbar-thumb { background: #ccc; border-radius: 10px; }
+
+        /* お役所風のデザインパーツ */
+        .mext-card { border-radius: 2px; border: 1px solid #d1d5db; background: white; box-shadow: 0 1px 1px rgba(0,0,0,0.05); }
+        .video-container {
+            position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden;
+            background: #000; border: 1px solid #000;
+        }
+        .video-container iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none; }
+        
+        /* パニック画面（Google偽装） */
+        #panic-screen {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: white; z-index: 99999; overflow: hidden; flex-direction: column;
+        }
+        .google-search-bar {
+            width: 100%; max-width: 584px; border: 1px solid #dfe1e5; border-radius: 24px;
+            padding: 8px 16px; display: flex; align-items: center; margin: 0 auto;
+        }
+        .google-search-bar:hover { box-shadow: 0 1px 6px rgba(32,33,36,0.28); border-color: rgba(223,225,229,0); }
+        
+        .panic-trigger {
+            position: fixed; top: 0; right: 0; width: 8px; height: 8px; z-index: 100000; cursor: default;
+        }
+
+        /* アニメーション */
+        .fade-in { animation: fadeIn 0.3s ease-out forwards; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    </style>
+</head>
+<body class="bg-[#f4f7f9] text-slate-800 text-sm">
+
+    <!-- 究極の隠しトリガー：右上隅にマウスで即発動 -->
+    <div class="panic-trigger" onmouseover="activatePanic()" onclick="activatePanic()"></div>
+
+    <!-- パニック画面：Google検索トップを完全に再現 -->
+    <div id="panic-screen">
+        <div class="flex justify-end p-3 space-x-4 text-sm text-slate-700 items-center">
+            <span class="hover:underline cursor-pointer">Gmail</span>
+            <span class="hover:underline cursor-pointer">画像</span>
+            <div class="p-2 hover:bg-slate-100 rounded-full cursor-pointer">
+                <svg class="w-6 h-6 text-slate-500" fill="currentColor" viewBox="0 0 24 24"><path d="M6,8c1.1,0,2-0.9,2-2s-0.9-2-2-2s-2,0.9-2,2S4.9,8,6,8z M12,20c1.1,0,2-0.9,2-2s-0.9-2-2-2s-2,0.9-2,2S10.9,20,12,20z M6,20 c1.1,0,2-0.9,2-2s-0.9-2-2-2s-2,0.9-2,2S4.9,20,6,20z M6,14c1.1,0,2-0.9,2-2s-0.9-2-2-2s-2,0.9-2,2S4.9,14,6,14z M12,14 c1.1,0,2-0.9,2-2s-0.9-2-2-2s-2,0.9-2,2S10.9,14,12,14z M12,8c1.1,0,2-0.9,2-2s-0.9-2-2-2s-2,0.9-2,2S10.9,8,12,8z M18,14 c1.1,0,2-0.9,2-2s-0.9-2-2-2s-2,0.9-2,2S16.9,14,18,14z M18,20c1.1,0,2-0.9,2-2s-0.9-2-2-2s-2,0.9-2,2S16.9,20,18,20z M18,8 c1.1,0,2-0.9,2-2s-0.9-2-2-2s-2,0.9-2,2S16.9,8,18,8z"/></svg>
+            </div>
+            <div class="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center text-white font-medium cursor-pointer">U</div>
+        </div>
+        <div class="flex-1 flex flex-col items-center pt-24">
+            <div class="mb-8 flex font-bold text-[92px] tracking-tight">
+                <span class="text-blue-500">G</span><span class="text-red-500">o</span><span class="text-yellow-500">o</span><span class="text-blue-500">g</span><span class="text-green-500">l</span><span class="text-red-500">e</span>
+            </div>
+            <div class="google-search-bar mb-6">
+                <svg class="w-5 h-5 text-slate-400 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                <input type="text" class="flex-1 outline-none text-base" value="" readonly>
+                <svg class="w-5 h-5 text-blue-500 ml-2" viewBox="0 0 24 24"><path fill="currentColor" d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3z"/><path fill="currentColor" d="M17 11c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z"/></svg>
+            </div>
+            <div class="flex space-x-3">
+                <button class="bg-[#f8f9fa] border border-[#f8f9fa] hover:border-slate-300 hover:shadow-sm px-4 py-2 rounded text-sm text-[#3c4043]">Google 検索</button>
+                <button class="bg-[#f8f9fa] border border-[#f8f9fa] hover:border-slate-300 hover:shadow-sm px-4 py-2 rounded text-sm text-[#3c4043]">I'm Feeling Lucky</button>
+            </div>
+        </div>
+        <footer class="bg-[#f2f2f2] text-[#70757a] text-sm">
+            <div class="px-8 py-3 border-b border-slate-300">日本</div>
+            <div class="px-8 py-3 flex flex-wrap justify-between">
+                <div class="flex space-x-6"><span>広告</span><span>ビジネス</span><span>検索の仕組み</span></div>
+                <div class="flex space-x-6"><span>プライバシー</span><span>規約</span><span>設定</span></div>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Header：文部科学省のヘッダー -->
+    <nav class="bg-[#003366] text-white px-5 py-2.5 flex justify-between items-center shadow-md">
+        <div class="flex items-center space-x-4">
+            <div class="flex items-center border-r border-white/30 pr-4 mr-2">
+                <div class="bg-white p-1 rounded-sm mr-2">
+                    <div class="w-4 h-4 bg-red-600 rounded-full"></div>
+                </div>
+                <span class="font-bold text-lg tracking-wider">文部科学省</span>
+            </div>
+            <span class="text-sm font-medium text-slate-100">統合学習支援クラウド <span class="text-xs bg-emerald-500 ml-2 px-1 rounded">Ver 7.4</span></span>
+        </div>
+        <div class="flex items-center space-x-6">
+            <div class="text-[10px] text-right">
+                <p class="opacity-70">SESSION ID: <span class="font-mono">MEXT-9982-AX</span></p>
+                <p class="text-emerald-400">STATUS: ENCRYPTED</p>
+            </div>
+            <button onclick="activatePanic()" class="bg-white/10 hover:bg-white/20 px-3 py-1 rounded text-[11px] border border-white/20 transition-all uppercase">Emergency (Esc)</button>
+        </div>
+    </nav>
+
+    <!-- メインレイアウト -->
+    <div class="flex min-h-screen">
+        <!-- Sidebar -->
+        <aside class="w-60 bg-white border-r border-slate-200 hidden lg:block">
+            <div class="p-6">
+                <div class="mb-8">
+                    <h3 class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-4">マイメニュー</h3>
+                    <ul class="space-y-4 text-[13px] font-bold text-slate-600">
+                        <li class="flex items-center space-x-3 text-blue-900"><span class="w-1.5 h-1.5 bg-blue-900 rounded-full"></span><span>学習ポータル</span></li>
+                        <li class="flex items-center space-x-3 hover:text-blue-900 cursor-pointer opacity-60"><span class="w-1.5 h-1.5 bg-slate-300 rounded-full"></span><span>出席管理</span></li>
+                        <li class="flex items-center space-x-3 hover:text-blue-900 cursor-pointer opacity-60"><span class="w-1.5 h-1.5 bg-slate-300 rounded-full"></span><span>デジタル成績表</span></li>
+                        <li class="flex items-center space-x-3 hover:text-blue-900 cursor-pointer opacity-60"><span class="w-1.5 h-1.5 bg-slate-300 rounded-full"></span><span>教員連絡用チャット</span></li>
+                    </ul>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="flex-1 p-6 lg:p-10 max-w-6xl mx-auto">
+            <!-- 検索エリア -->
+            <section class="mext-card p-8 mb-10 bg-white">
+                <div class="flex items-center space-x-2 mb-6 text-slate-600">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg>
+                    <h2 class="font-bold text-lg">動画アーカイブ・リサーチシステム</h2>
+                </div>
+                
+                <div class="flex space-x-2 shadow-sm">
+                    <input type="text" id="main-query" placeholder="学習用動画のタイトルまたはキーワードを入力..." class="flex-1 border border-slate-300 rounded px-5 py-3 text-base focus:ring-2 focus:ring-blue-900 outline-none transition-all">
+                    <button onclick="fetchResources()" id="fetch-btn" class="bg-[#003366] hover:bg-blue-900 text-white px-10 py-3 rounded font-bold transition-all flex items-center">
+                        検索
+                    </button>
+                </div>
+
+                <div class="mt-4 flex justify-between items-center px-1">
+                    <div class="text-[11px] text-slate-400 font-mono">
+                        SERVER_SYNC: <span id="current-node-display">Invidious-Secure (A)</span>
+                    </div>
+                    <div class="flex items-center">
+                        <span class="text-[11px] bg-red-100 text-red-700 px-2 py-0.5 rounded mr-4 font-bold">自動消音モード有効</span>
+                        <span class="text-[11px] text-slate-400 mr-2">PROXY NODE:</span>
+                        <select id="node-selector" onchange="updateNode()" class="text-[11px] bg-slate-100 border-none rounded px-2 py-0.5 outline-none text-slate-600">
+                            <option value="https://invidious.ducks.party">Node A (JP-Safe)</option>
+                            <option value="https://inv.tux.rs">Node B (Speed)</option>
+                            <option value="https://invidious.flokinet.to">Node C (Global)</option>
+                            <option value="https://vid.priv.au">Node D (Australia)</option>
+                            <option value="https://invidious.projectsegfau.lt">Node E (Robust)</option>
+                        </select>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 動画リスト表示 -->
+            <div id="results-grid" class="hidden grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 mb-12 fade-in">
+                <!-- Data -->
+            </div>
+
+            <!-- プレイヤーセクション -->
+            <section id="module-viewer" class="hidden fade-in">
+                <div class="mext-card overflow-hidden">
+                    <div class="bg-[#f8fafc] border-b border-slate-200 px-5 py-3 flex justify-between items-center">
+                        <div class="flex items-center space-x-3">
+                            <span class="bg-blue-900 text-white text-[10px] px-2 py-0.5 rounded font-bold">教材閲覧中</span>
+                            <h3 class="font-bold text-slate-700 text-sm truncate max-w-md" id="module-title">Resource Name</h3>
+                        </div>
+                        <button onclick="terminateModule()" class="text-slate-400 hover:text-red-600 transition-colors">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                        </button>
+                    </div>
+                    
+                    <div class="video-container">
+                        <iframe id="viewer-iframe" src="" allow="autoplay; fullscreen; encrypted-media"></iframe>
+                    </div>
+
+                    <div class="p-4 bg-slate-50 border-t border-slate-200 flex justify-between items-center">
+                        <p class="text-[11px] text-slate-500 font-medium italic">※ 初期設定で消音になっています。音を聞く場合はプレイヤーの音量を上げてください。</p>
+                        <div class="flex space-x-2">
+                            <button onclick="emergencyReroute()" class="text-[11px] bg-white border border-slate-300 hover:bg-slate-100 px-4 py-1.5 rounded font-bold text-blue-900 transition-all">
+                                サーバー再接続
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-white border-t border-slate-200 py-10 text-center">
+        <p class="text-xs text-slate-400">&copy; 2026 Ministry of Education, Culture, Sports, Science and Technology. All Rights Reserved.</p>
+    </footer>
+
+    <script>
+        let currentVideoId = "";
+
+        // 検索実行
+        async function fetchResources() {
+            const query = document.getElementById('main-query').value.trim();
+            const grid = document.getElementById('results-grid');
+            const node = document.getElementById('node-selector').value;
+            const btn = document.getElementById('fetch-btn');
+
+            if (!query) return;
+
+            // UI更新
+            btn.disabled = true;
+            btn.innerHTML = '<span class="animate-pulse">取得中...</span>';
+            grid.innerHTML = '<div class="col-span-full py-20 text-center text-slate-400 italic">サーバーと安全な接続を確立しています...</div>';
+            grid.classList.remove('hidden');
+
+            try {
+                // Invidious API を使用した検索
+                const res = await fetch(`${node}/api/v1/search?q=${encodeURIComponent(query)}`);
+                if (!res.ok) throw new Error('Proxy error');
+                const data = await res.json();
+                
+                grid.innerHTML = '';
+                btn.disabled = false;
+                btn.innerText = "検索";
+
+                // 動画のみを表示
+                const videos = data.filter(i => i.type === 'video').slice(0, 15);
+                
+                if (videos.length === 0) {
+                    grid.innerHTML = '<div class="col-span-full py-10 text-center text-slate-500">該当する教材が見つかりませんでした。別のキーワードを試してください。</div>';
+                    return;
+                }
+
+                videos.forEach(item => {
+                    const card = document.createElement('div');
+                    card.className = "mext-card p-3 hover:border-blue-900 cursor-pointer transition-all hover:shadow-lg group bg-white";
+                    card.onclick = () => launchModule(item.videoId, item.title);
+                    card.innerHTML = `
+                        <div class="w-full aspect-video bg-slate-900 mb-3 overflow-hidden rounded-sm relative">
+                            <img src="${item.videoThumbnails?.[0]?.url}" class="w-full h-full object-cover opacity-90 group-hover:scale-105 transition-transform">
+                            <div class="absolute bottom-1 right-1 bg-black/70 text-white text-[9px] px-1 rounded">${Math.floor(item.lengthSeconds/60)}:${(item.lengthSeconds%60).toString().padStart(2,'0')}</div>
+                        </div>
+                        <p class="font-bold text-[13px] text-slate-700 line-clamp-2 leading-snug">${item.title}</p>
+                        <p class="text-[10px] text-slate-400 mt-2 font-medium">${item.author} ・ 文部科学省認定リソース</p>
+                    `;
+                    grid.appendChild(card);
+                });
+            } catch (e) {
+                console.error(e);
+                rotateAuto();
+                fetchResources(); // 自動的に別のノードでリトライ
+            }
+        }
+
+        // 動画をロード（消音設定を強制）
+        function launchModule(id, title) {
+            currentVideoId = id;
+            const node = document.getElementById('node-selector').value;
+            const viewer = document.getElementById('module-viewer');
+            const iframe = document.getElementById('viewer-iframe');
+            
+            document.getElementById('module-title').innerText = title;
+            // パラメータ：mute=1 (消音) を追加
+            iframe.src = `${node}/embed/${id}?autoplay=1&local=true&quality=360p&mute=1&volume=0`;
+            
+            viewer.classList.remove('hidden');
+            viewer.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+
+        // 次のノードへ自動切替
+        function rotateAuto() {
+            const sel = document.getElementById('node-selector');
+            sel.selectedIndex = (sel.selectedIndex + 1) % sel.options.length;
+            updateNode();
+        }
+
+        // 再接続
+        function emergencyReroute() {
+            rotateAuto();
+            if (currentVideoId) {
+                launchModule(currentVideoId, document.getElementById('module-title').innerText);
+            }
+        }
+
+        // ビューアを閉じる
+        function terminateModule() {
+            document.getElementById('viewer-iframe').src = "";
+            document.getElementById('module-viewer').classList.add('hidden');
+        }
+
+        // UI表示用のノード名更新
+        function updateNode() {
+            const sel = document.getElementById('node-selector');
+            document.getElementById('current-node-display').innerText = sel.options[sel.selectedIndex].text;
+        }
+
+        // --- パニック（Google偽装）システム ---
+
+        function activatePanic() {
+            document.getElementById('panic-screen').style.display = 'flex';
+            document.title = "Google";
+            terminateModule();
+        }
+
+        // キーボードショートカット
+        window.addEventListener('keydown', (e) => {
+            // Escキーでパニック画面
+            if (e.key === 'Escape') activatePanic();
+            
+            // スペースキーで瞬時に消音（ミュート）にする
+            if (e.key === ' ' && !document.getElementById('module-viewer').classList.contains('hidden')) {
+                // スペースキーでのページスクロールを防止
+                e.preventDefault();
+                const iframe = document.getElementById('viewer-iframe');
+                // iframeをリロードして音量をリセット（確実な消音）
+                if (currentVideoId) {
+                   const node = document.getElementById('node-selector').value;
+                   iframe.src = `${node}/embed/${currentVideoId}?autoplay=1&local=true&quality=360p&mute=1&volume=0`;
+                }
+            }
+
+            if (e.key === 'Enter' && document.activeElement.id === 'main-query') fetchResources();
+        });
+
+        // 復帰方法：画面中央をダブルクリック
+        document.getElementById('panic-screen').addEventListener('dblclick', () => {
+            document.getElementById('panic-screen').style.display = 'none';
+            document.title = "文部科学省 統合学習支援システム | マイページ";
+        });
+
+        // 右クリックを無効化
+        document.addEventListener('contextmenu', e => e.preventDefault());
+    </script>
+</body>
+</html>
